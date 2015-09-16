@@ -12,11 +12,12 @@ buildpack_root=$PWD
 buildpack_pcre_version=8.36
 buildpack_pcre_url=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre
 buildpack_pcre_download=$buildpack_pcre_url/pcre-$buildpack_pcre_version.tar.gz
+buildpack_redis2=https://www.dropbox.com/s/3kpnxo3ljgtq6o9/redis2-nginx-module-master.tar.gz?dl=1
 
 # ---------------------------------------------------------------------
 
 buildpack_nginx_url=http://nginx.org/download
-buildpack_nginx_version=1.6.2
+buildpack_nginx_version=1.9.4
 buildpack_nginx_build_flags=(
   --with-http_gzip_static_module
   --with-http_realip_module
@@ -36,6 +37,7 @@ buildpack_nginx_build_flags=(
   --without-http_empty_gif_module
   --prefix=/app/nginx
   --with-pcre=./pcre-$buildpack_pcre_version
+  --add-module=
 )
 
 buildpack_nginx_download=$buildpack_nginx_url/nginx-$buildpack_nginx_version.tar.gz
@@ -56,12 +58,14 @@ function buildpack_download()
 {
   nginx=$(basename ${buildpack_nginx_download%.tar.gz})
   mkdir -p $buildpack_root/sources
+  mkdir -p $buildpack_root/sources/redis2
   cd $buildpack_root/sources
 
   if curl -s $buildpack_nginx_download |tar xzv
   then
     # Puts PCRE into the NGINX folder so it uploads yo.
     curl -s $buildpack_pcre_download |tar xzv -C $nginx
+    curl -s $buildpack_redis2 | tar xzv -C redis2
   fi
 }
 
